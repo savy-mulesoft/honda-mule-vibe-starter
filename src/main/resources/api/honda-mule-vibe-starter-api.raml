@@ -1,0 +1,57 @@
+#%RAML 1.0
+title: Honda Mule Vibe Starter API
+version: v1
+baseUri: http://localhost:8081/api
+
+description: |
+  A Honda Mule Vibe Starter API showcasing modern MuleSoft development.
+  Provides basic greeting functionality.
+
+mediaType: application/json
+
+types:
+  HelloResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        description: The greeting message
+        example: "Hello World from Honda Mule Vibe Starter API!"
+      status:
+        type: string
+        description: Current application status
+        example: "running"
+      timestamp:
+        type: datetime
+        description: Response timestamp
+        example: "2026-01-18T12:59:38.123-05:00"
+      application:
+        type: object
+        properties:
+          name:
+            type: string
+            description: Application name
+            example: "honda-mule-vibe-starter-api"
+          version:
+            type: string
+            description: Application version
+            example: "1.0.0-SNAPSHOT"
+
+/hello:
+  displayName: Hello World Endpoint
+  description: Returns a greeting message with application information
+  get:
+    description: Get a hello world greeting with application status
+    responses:
+      200:
+        description: Successful greeting response
+        body:
+          application/json:
+            type: HelloResponse
+            example:
+              message: "Hello World from Honda Mule Vibe Starter API!"
+              status: "running"
+              timestamp: "2026-01-18T12:59:38.123-05:00"
+              application:
+                name: "honda-mule-vibe-starter-api"
+                version: "1.0.0-SNAPSHOT"
