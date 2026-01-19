@@ -7,7 +7,7 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 ### Prerequisites
 - Java 17
 - Maven 3.8+
-- **MS SQL Server access** (cloud-services.demos.mulesoft.com provided)
+- **Your own MS SQL Server instance** (local, cloud, or provided by your organization)
 
 ### ⚠️ **VERY IMPORTANT** - Before You Start
 **Replace the Organization ID in pom.xml with your own Anypoint Platform Organization ID!**
@@ -24,24 +24,31 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 
 ### 🗄️ **Database Setup for Hackathon Participants**
 
-**STEP 1: Update SQL Script with Your Employee ID**
+**STEP 1: Configure Your SQL Server Connection**
+1. Open `src/main/resources/application.properties`
+2. Update **ALL** database connection details with your own SQL Server instance:
+   ```properties
+   # Replace with YOUR SQL Server details
+   db.host=YOUR_SQL_SERVER_HOST
+   db.port=YOUR_SQL_SERVER_PORT
+   db.name=YOUR_DATABASE_NAME
+   db.username=YOUR_USERNAME
+   db.password=YOUR_PASSWORD
+   db.schema=YOUR_SCHEMA_NAME
+   db.table=prdt_ctgry_[YOUR_EMPLOYEE_ID]
+   ```
+
+**STEP 2: Update SQL Script with Your Employee ID**
 1. Open `src/main/resources/sql/initial_setup.sql`
 2. Find the table name: `prdt_ctgry_12345`
 3. Replace `12345` with **your employee ID**
-4. The schema name `mule_hkthn_0226` should remain unchanged
+4. Update the schema name to match your database schema
 
-**STEP 2: Execute Database Setup**
-1. Connect to the MS SQL Server: `cloud-services.demos.mulesoft.com:32024`
-2. Use credentials: `sa / Argenyx-123456789`
+**STEP 3: Execute Database Setup**
+1. Connect to **YOUR** MS SQL Server instance
+2. Use **YOUR** database credentials
 3. Execute the updated `initial_setup.sql` script
-4. Verify your table is created: `mule_hkthn_0226.prdt_ctgry_[YOUR_EMPLOYEE_ID]`
-
-**STEP 3: Update Application Properties**
-1. Open `src/main/resources/application.properties`
-2. Update the table name:
-   ```properties
-   db.table=prdt_ctgry_[YOUR_EMPLOYEE_ID]
-   ```
+4. Verify your table is created: `[YOUR_SCHEMA].prdt_ctgry_[YOUR_EMPLOYEE_ID]`
 
 ### Run the Application
 
@@ -181,10 +188,10 @@ curl --location 'http://localhost:8081/api/v1/product-categories?productLine=B&p
 ## 🎯 Hackathon Validation Checklist
 
 ### ✅ **Connectivity Test**
-- [ ] Local Anypoint Code Builder connects to MS SQL Server
-- [ ] Database credentials work: `sa / Argenyx-123456789`
-- [ ] Can access schema: `mule_hkthn_0226`
-- [ ] Custom table created: `prdt_ctgry_[YOUR_EMPLOYEE_ID]`
+- [ ] Local Anypoint Code Builder connects to YOUR MS SQL Server instance
+- [ ] YOUR database credentials work correctly
+- [ ] Can access YOUR database schema
+- [ ] Custom table created: `prdt_ctgry_[YOUR_EMPLOYEE_ID]` in YOUR schema
 
 ### ✅ **API Functionality Test**
 - [ ] PUT endpoint successfully inserts new records
@@ -202,12 +209,12 @@ curl --location 'http://localhost:8081/api/v1/product-categories?productLine=B&p
 ## 🏗️ Technical Architecture
 
 ### **Database Configuration:**
-- **Host:** `cloud-services.demos.mulesoft.com:32024`
-- **Database:** `master`
-- **Schema:** `mule_hkthn_0226`
-- **Table Pattern:** `prdt_ctgry_[EMPLOYEE_ID]`
+- **Host:** `[YOUR_SQL_SERVER_HOST]:[YOUR_SQL_SERVER_PORT]`
+- **Database:** `[YOUR_DATABASE_NAME]`
+- **Schema:** `[YOUR_SCHEMA_NAME]`
+- **Table Pattern:** `prdt_ctgry_[YOUR_EMPLOYEE_ID]`
 - **Driver:** SQL Server JDBC 11.2.3.jre17 (configured as shared library)
-- **SSL:** Certificate validation bypassed for cloud database
+- **SSL:** Certificate validation bypassed for cloud database connections
 
 ### **API Endpoints:**
 - `GET /api/hello` - Basic health check
