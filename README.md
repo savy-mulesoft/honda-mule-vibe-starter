@@ -69,30 +69,49 @@ Or use Postman:
 
 Verify you get the expected response showing your API is working correctly.
 
-### 2. Publish API to Anypoint Exchange (Optional)
-Want to publish your API specification to Anypoint Exchange? Use Mule Vibe Agent!
+### 2. Add Welcome Endpoint and Publish to Exchange
+Extend your API by adding a welcome endpoint and publishing to Anypoint Exchange using Mule Vibe Agent!
 
 **Prompt to use in Mule Vibe Agent:**
 ```
-publish this api to exchange
+Create a new endpoint /welcome in the API that responds with a welcome message. Update the API specification and publish the updated API to Anypoint Exchange, and implement the flow with the welcome functionality.
 ```
 
 **What to expect:**
 The agent will:
-1. Examine your RAML specification (`honda-mule-vibe-starter-api.raml`)
-2. Extract project information from `pom.xml`
-3. Publish the API asset to Anypoint Exchange
-4. Provide confirmation with asset details:
+1. Update the RAML specification (`honda-mule-vibe-starter-api.raml`) to include `/welcome` endpoint
+2. Modify the Mule flow (`honda-mule-vibe-starter.xml`) to implement the welcome functionality
+3. Publish the updated API specification to Anypoint Exchange
+4. Provide confirmation with updated asset details:
    - Asset ID: `honda-mule-vibe-starter-api`
-   - Version: `1.0.0`
-   - Type: `rest-api` (RAML)
-   - Status: `published`
+   - New endpoint: `GET /api/welcome`
+   - Updated version and Exchange publication status
 
-**Benefits of publishing to Exchange:**
-- ✅ API Documentation automatically generated
-- ✅ API Console for interactive testing
-- ✅ Reusable asset for other projects
-- ✅ Version management and governance
-- ✅ Integration with API Manager for policies
+**Testing Instructions:**
+After the agent completes the task:
+
+1. **Test locally first:**
+   ```bash
+   # Start your application
+   mvn clean package
+   # Then run via Visual Studio > Run and Debug
+   
+   # Test the new welcome endpoint
+   curl http://localhost:8081/api/welcome
+   ```
+
+2. **Validate on Anypoint Exchange:**
+   - Log into Anypoint Platform
+   - Navigate to Design Center > Exchange
+   - Find your published API asset
+   - Use the API Console to test the `/welcome` endpoint
+   - Verify the updated specification includes the new endpoint
+
+**Benefits of this enhancement:**
+- ✅ Extended API functionality with welcome endpoint
+- ✅ Updated API specification published to Exchange
+- ✅ API Console available for interactive testing
+- ✅ Version-controlled API asset with governance
+- ✅ Ready for API Manager policy application
 
 Happy coding! 🎯
