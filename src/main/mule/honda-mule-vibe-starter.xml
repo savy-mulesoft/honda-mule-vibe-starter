@@ -4,15 +4,36 @@
       xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-        http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+        http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+        http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <!-- Configuration Properties -->
     <configuration-properties file="application.properties" doc:name="Configuration properties" />
+
+    <!-- Database Configuration -->
+    <db:config name="Database_Config" doc:name="Database Config">
+        <db:mssql-connection host="${db.host}" 
+                             port="${db.port}" 
+                             user="${db.username}" 
+                             password="${db.password}" 
+                             databaseName="${db.name}">
+            <db:pooling-profile maxPoolSize="${db.connection.pool.maxPoolSize}" 
+                               minPoolSize="${db.connection.pool.minPoolSize}" 
+                               acquireIncrement="${db.connection.pool.acquireIncrement}" 
+                               preparedStatementCacheSize="${db.connection.pool.preparedStatementCacheSize}" />
+            <db:connection-properties>
+                <db:connection-property key="encrypt" value="true" />
+                <db:connection-property key="trustServerCertificate" value="true" />
+                <db:connection-property key="loginTimeout" value="30" />
+            </db:connection-properties>
+        </db:mssql-connection>
+    </db:config>
 
     <!-- HTTP Listener Configuration -->
     <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config">
@@ -49,8 +70,8 @@ output application/json
   "status": "running",
   "timestamp": now(),
   "application": {
-    "name": "${app.name}",
-    "version": "${app.version}"
+    "name": p('app.name'),
+    "version": p('app.version')
   }
 }]]></ee:set-payload>
             </ee:message>
@@ -58,5 +79,405 @@ output application/json
         <logger level="INFO" doc:name="Response Logger" 
                 message="Hello World response sent successfully" />
     </flow>
+
+    <!-- GET /welcome Implementation -->
+    <flow name="get:\welcome:honda-mule-vibe-starter-api-config" doc:name="get:\welcome:honda-mule-vibe-starter-api-config">
+        <logger level="INFO" doc:name="Request Logger" 
+                message="GET /api/welcome endpoint called" />
+        <ee:transform doc:name="Welcome Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "welcomeMessage": "Welcome to Honda Mule Vibe Starter API! Ready to accelerate your development journey.",
+  "status": "active",
+  "timestamp": now(),
+  "features": [
+    "hello endpoint",
+    "welcome endpoint", 
+    "APIKit integration",
+    "product categories management"
+  ]
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Response Logger" 
+                message="Welcome response sent successfully" />
+    </flow>
+
+    <!-- PUT /v1/product-categories Implementation -->
+    <flow name="put:\v1\product-categories:honda-mule-vibe-starter-api-config" doc:name="put:\v1\product-categories:honda-mule-vibe-starter-api-config">
+        <logger level="INFO" doc:name="Request Logger" 
+                message='PUT /api/v1/product-categories called with correlationId: #[attributes.headers.correlationId default "N/A"]' />
+        
+        <!-- Header Validation -->
+        <choice doc:name="Validate Required Headers">
+            <when expression="#[isEmpty(attributes.headers.consumerId) or isEmpty(attributes.headers.consumerName) or isEmpty(attributes.headers.correlationId) or isEmpty(attributes.headers.callerName)]">
+                <raise-error type="CUSTOM:MISSING_HEADER" description="Required headers missing: consumerId, consumerName, correlationId, or callerName" />
+            </when>
+            <otherwise>
+                <logger level="DEBUG" doc:name="Headers Valid" message="All required headers present" />
+            </otherwise>
+        </choice>
+
+        <!-- Business Key Validation -->
+        <choice doc:name="Validate Business Keys">
+            <when expression="#[isEmpty(payload.productLine) or isEmpty(payload.productCategoryCode) or isEmpty(payload.productCategoryGroupCode)]">
+                <raise-error type="CUSTOM:MISSING_BUSINESS_KEYS" description="Required business keys missing: productLine, productCategoryCode, or productCategoryGroupCode" />
+            </when>
+            <otherwise>
+                <logger level="DEBUG" doc:name="Business Keys Valid" message="All business keys present" />
+            </otherwise>
+        </choice>
+
+        <!-- Store Input for Processing -->
+        <set-variable variableName="inputPayload" value="#[payload]" doc:name="Store Input Payload" />
+        <set-variable variableName="correlationId" value="#[attributes.headers.correlationId]" doc:name="Store Correlation ID" />
+
+        <!-- Simulate Existing Record Lookup (In-Memory for Hackathon) -->
+        <flow-ref name="lookup-existing-product-category" doc:name="Lookup Existing Record" />
+        
+        <!-- Determine Operation Based on Business Logic -->
+        <flow-ref name="determine-product-category-operation" doc:name="Determine Operation" />
+        
+        <!-- Execute Operation -->
+        <choice doc:name="Execute Based on Action Code">
+            <when expression="#[vars.actionCode == 'A']">
+                <flow-ref name="insert-product-category" doc:name="Insert Product Category" />
+            </when>
+            <when expression="#[vars.actionCode == 'C']">
+                <flow-ref name="update-product-category" doc:name="Update Product Category" />
+            </when>
+            <when expression="#[vars.actionCode == 'D']">
+                <flow-ref name="delete-product-category" doc:name="Delete Product Category" />
+            </when>
+            <otherwise>
+                <!-- No Operation - Set 204 status -->
+                <set-variable variableName="httpStatus" value="204" doc:name="Set No Content Status" />
+                <set-payload value="#[null]" doc:name="Set Empty Response" />
+            </otherwise>
+        </choice>
+
+        <logger level="INFO" doc:name="Response Logger" 
+                message='Product category operation completed: #[vars.actionCode default "NO_OP"] for correlationId: #[vars.correlationId]' />
+    </flow>
+
+    <!-- GET /v1/product-categories Implementation -->
+    <flow name="get:\v1\product-categories:honda-mule-vibe-starter-api-config" doc:name="get:\v1\product-categories:honda-mule-vibe-starter-api-config">
+        <logger level="INFO" doc:name="Request Logger" 
+                message='GET /api/v1/product-categories called with correlationId: #[attributes.headers.correlationId default "N/A"]' />
+        
+        <!-- Header Validation -->
+        <choice doc:name="Validate Required Headers">
+            <when expression="#[isEmpty(attributes.headers.consumerId) or isEmpty(attributes.headers.consumerName) or isEmpty(attributes.headers.correlationId) or isEmpty(attributes.headers.callerName)]">
+                <raise-error type="CUSTOM:MISSING_HEADER" description="Required headers missing: consumerId, consumerName, correlationId, or callerName" />
+            </when>
+            <otherwise>
+                <logger level="DEBUG" doc:name="Headers Valid" message="All required headers present" />
+            </otherwise>
+        </choice>
+
+        <!-- Query Parameter Validation -->
+        <choice doc:name="Validate Query Parameters">
+            <when expression="#[isEmpty(attributes.queryParams.productLine) or isEmpty(attributes.queryParams.productCategoryCode) or isEmpty(attributes.queryParams.productCategoryGroupCode)]">
+                <raise-error type="CUSTOM:MISSING_QUERY_PARAMS" description="Required query parameters missing: productLine, productCategoryCode, or productCategoryGroupCode" />
+            </when>
+            <otherwise>
+                <logger level="DEBUG" doc:name="Query Params Valid" message="All query parameters present" />
+            </otherwise>
+        </choice>
+
+        <!-- Store Query Parameters -->
+        <set-variable variableName="correlationId" value="#[attributes.headers.correlationId]" doc:name="Store Correlation ID" />
+        <set-variable variableName="queryParams" value="#[attributes.queryParams]" doc:name="Store Query Params" />
+
+        <!-- Lookup Product Category -->
+        <flow-ref name="lookup-existing-product-category" doc:name="Lookup Product Category" />
+        
+        <!-- Check if Record Found -->
+        <choice doc:name="Check Record Found">
+            <when expression="#[vars.existingRecord != null]">
+                <ee:transform doc:name="Build Response">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "actionCode": "C",
+  "productLine": vars.existingRecord.productLine,
+  "productCategoryCode": vars.existingRecord.productCategoryCode,
+  "productCategoryGroupCode": vars.existingRecord.productCategoryGroupCode,
+  "productCategoryName": vars.existingRecord.productCategoryName,
+  "doorType": vars.existingRecord.doorType,
+  "cylinderCount": vars.existingRecord.cylinderCount,
+  "motivePower": vars.existingRecord.motivePower,
+  "groupName": vars.existingRecord.productCategoryGroupName,
+  "timestamp": now()
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </when>
+            <otherwise>
+                <set-variable variableName="httpStatus" value="404" doc:name="Set Not Found Status" />
+                <ee:transform doc:name="Not Found Response">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "error": "Not found",
+  "message": "Product category not found for the provided business keys",
+  "timestamp": now()
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </otherwise>
+        </choice>
+
+        <logger level="INFO" doc:name="Response Logger" 
+                message='Product category lookup completed for correlationId: #[vars.correlationId]' />
+    </flow>
+
+    <!-- Sub-flow: Lookup Existing Product Category -->
+    <sub-flow name="lookup-existing-product-category" doc:name="lookup-existing-product-category">
+        <logger level="DEBUG" doc:name="Lookup Logger" message="Looking up existing product category record" />
+        
+        <db:select config-ref="Database_Config" doc:name="Query Product Category">
+            <db:sql><![CDATA[SELECT 
+                product_line,
+                product_category_code,
+                product_category_group_code,
+                product_category_name,
+                door_type,
+                cylinder_count,
+                motive_power,
+                product_category_group_name,
+                business_key_delete_indicator,
+                last_action_code
+            FROM ${db.schema}.${db.table}
+            WHERE product_line = :productLine 
+                AND product_category_code = :productCategoryCode 
+                AND product_category_group_code = :productCategoryGroupCode]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
+                productLine: if (vars.inputPayload != null) vars.inputPayload.productLine else vars.queryParams.productLine,
+                productCategoryCode: if (vars.inputPayload != null) vars.inputPayload.productCategoryCode else vars.queryParams.productCategoryCode,
+                productCategoryGroupCode: if (vars.inputPayload != null) vars.inputPayload.productCategoryGroupCode else vars.queryParams.productCategoryGroupCode
+            }]]]></db:input-parameters>
+        </db:select>
+        
+        <ee:transform doc:name="Transform DB Result">
+            <ee:variables>
+                <ee:set-variable variableName="existingRecord"><![CDATA[%dw 2.0
+output application/java
+---
+if (sizeOf(payload) > 0)
+  {
+    productLine: payload[0].product_line,
+    productCategoryCode: payload[0].product_category_code,
+    productCategoryGroupCode: payload[0].product_category_group_code,
+    productCategoryName: payload[0].product_category_name,
+    doorType: payload[0].door_type,
+    cylinderCount: payload[0].cylinder_count,
+    motivePower: payload[0].motive_power,
+    productCategoryGroupName: payload[0].product_category_group_name,
+    businessKeyDeleteIndicator: payload[0].business_key_delete_indicator default "N"
+  }
+else null]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        
+        <logger level="DEBUG" doc:name="Lookup Result" 
+                message='Existing record found: #[vars.existingRecord != null]' />
+    </sub-flow>
+
+    <!-- Sub-flow: Determine Operation -->
+    <sub-flow name="determine-product-category-operation" doc:name="determine-product-category-operation">
+        <logger level="DEBUG" doc:name="Operation Logger" message="Determining operation based on business logic" />
+        
+        <ee:transform doc:name="Determine Action Code">
+            <ee:variables>
+                <ee:set-variable variableName="actionCode"><![CDATA[%dw 2.0
+output application/java
+---
+if (vars.existingRecord == null) 
+  "A"
+else if ((vars.inputPayload.businessKeyDeleteIndicator default "N") == "Y") 
+  "D"
+else if (
+  vars.existingRecord.productCategoryName != vars.inputPayload.productCategoryName or
+  vars.existingRecord.doorType != vars.inputPayload.doorType or
+  vars.existingRecord.cylinderCount != vars.inputPayload.cylinderCount or
+  vars.existingRecord.motivePower != vars.inputPayload.motivePower or
+  vars.existingRecord.productCategoryGroupName != vars.inputPayload.productCategoryGroupName
+) 
+  "C"
+else 
+  "NO_OP"]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        
+        <logger level="INFO" doc:name="Action Code Logger" 
+                message='Determined action code: #[vars.actionCode]' />
+    </sub-flow>
+
+    <!-- Sub-flow: Insert Product Category -->
+    <sub-flow name="insert-product-category" doc:name="insert-product-category">
+        <logger level="INFO" doc:name="Insert Logger" message="Inserting new product category record" />
+        
+        <db:insert config-ref="Database_Config" doc:name="Insert to Database">
+            <db:sql><![CDATA[INSERT INTO ${db.schema}.${db.table} (
+                product_line,
+                product_category_code,
+                product_category_group_code,
+                product_category_name,
+                door_type,
+                cylinder_count,
+                motive_power,
+                product_category_group_name,
+                business_key_delete_indicator,
+                last_action_code,
+                created_utc,
+                updated_utc
+            ) VALUES (
+                :productLine,
+                :productCategoryCode,
+                :productCategoryGroupCode,
+                :productCategoryName,
+                :doorType,
+                :cylinderCount,
+                :motivePower,
+                :productCategoryGroupName,
+                :businessKeyDeleteIndicator,
+                :lastActionCode,
+                SYSUTCDATETIME(),
+                SYSUTCDATETIME()
+            )]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
+                productLine: vars.inputPayload.productLine,
+                productCategoryCode: vars.inputPayload.productCategoryCode,
+                productCategoryGroupCode: vars.inputPayload.productCategoryGroupCode,
+                productCategoryName: vars.inputPayload.productCategoryName,
+                doorType: vars.inputPayload.doorType,
+                cylinderCount: vars.inputPayload.cylinderCount,
+                motivePower: vars.inputPayload.motivePower,
+                productCategoryGroupName: vars.inputPayload.productCategoryGroupName,
+                businessKeyDeleteIndicator: vars.inputPayload.businessKeyDeleteIndicator default "N",
+                lastActionCode: "A"
+            }]]]></db:input-parameters>
+        </db:insert>
+        
+        <ee:transform doc:name="Insert Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "actionCode": "A",
+  "productLine": vars.inputPayload.productLine,
+  "productCategoryCode": vars.inputPayload.productCategoryCode,
+  "productCategoryGroupCode": vars.inputPayload.productCategoryGroupCode,
+  "productCategoryName": vars.inputPayload.productCategoryName,
+  "doorType": vars.inputPayload.doorType,
+  "cylinderCount": vars.inputPayload.cylinderCount,
+  "motivePower": vars.inputPayload.motivePower,
+  "groupName": vars.inputPayload.productCategoryGroupName,
+  "timestamp": now(),
+  "recordsAffected": payload.affectedRows
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </sub-flow>
+
+    <!-- Sub-flow: Update Product Category -->
+    <sub-flow name="update-product-category" doc:name="update-product-category">
+        <logger level="INFO" doc:name="Update Logger" message="Updating existing product category record" />
+        
+        <db:update config-ref="Database_Config" doc:name="Update Database">
+            <db:sql><![CDATA[UPDATE ${db.schema}.${db.table} SET 
+                product_category_name = :productCategoryName,
+                door_type = :doorType,
+                cylinder_count = :cylinderCount,
+                motive_power = :motivePower,
+                product_category_group_name = :productCategoryGroupName,
+                business_key_delete_indicator = :businessKeyDeleteIndicator,
+                last_action_code = :lastActionCode,
+                updated_utc = SYSUTCDATETIME()
+            WHERE product_line = :productLine 
+                AND product_category_code = :productCategoryCode 
+                AND product_category_group_code = :productCategoryGroupCode]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
+                productLine: vars.inputPayload.productLine,
+                productCategoryCode: vars.inputPayload.productCategoryCode,
+                productCategoryGroupCode: vars.inputPayload.productCategoryGroupCode,
+                productCategoryName: vars.inputPayload.productCategoryName,
+                doorType: vars.inputPayload.doorType,
+                cylinderCount: vars.inputPayload.cylinderCount,
+                motivePower: vars.inputPayload.motivePower,
+                productCategoryGroupName: vars.inputPayload.productCategoryGroupName,
+                businessKeyDeleteIndicator: vars.inputPayload.businessKeyDeleteIndicator default "N",
+                lastActionCode: "C"
+            }]]]></db:input-parameters>
+        </db:update>
+        
+        <ee:transform doc:name="Update Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "actionCode": "C",
+  "productLine": vars.inputPayload.productLine,
+  "productCategoryCode": vars.inputPayload.productCategoryCode,
+  "productCategoryGroupCode": vars.inputPayload.productCategoryGroupCode,
+  "productCategoryName": vars.inputPayload.productCategoryName,
+  "doorType": vars.inputPayload.doorType,
+  "cylinderCount": vars.inputPayload.cylinderCount,
+  "motivePower": vars.inputPayload.motivePower,
+  "groupName": vars.inputPayload.productCategoryGroupName,
+  "timestamp": now(),
+  "recordsAffected": payload.affectedRows
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </sub-flow>
+
+    <!-- Sub-flow: Delete Product Category -->
+    <sub-flow name="delete-product-category" doc:name="delete-product-category">
+        <logger level="INFO" doc:name="Delete Logger" message="Deleting product category record" />
+        
+        <db:delete config-ref="Database_Config" doc:name="Delete from Database">
+            <db:sql><![CDATA[DELETE FROM ${db.schema}.${db.table}
+            WHERE product_line = :productLine 
+                AND product_category_code = :productCategoryCode 
+                AND product_category_group_code = :productCategoryGroupCode]]></db:sql>
+            <db:input-parameters><![CDATA[#[{
+                productLine: vars.inputPayload.productLine,
+                productCategoryCode: vars.inputPayload.productCategoryCode,
+                productCategoryGroupCode: vars.inputPayload.productCategoryGroupCode
+            }]]]></db:input-parameters>
+        </db:delete>
+        
+        <ee:transform doc:name="Delete Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "actionCode": "D",
+  "productLine": vars.inputPayload.productLine,
+  "productCategoryCode": vars.inputPayload.productCategoryCode,
+  "productCategoryGroupCode": vars.inputPayload.productCategoryGroupCode,
+  "productCategoryName": vars.inputPayload.productCategoryName,
+  "doorType": vars.inputPayload.doorType,
+  "cylinderCount": vars.inputPayload.cylinderCount,
+  "motivePower": vars.inputPayload.motivePower,
+  "groupName": vars.inputPayload.productCategoryGroupName,
+  "timestamp": now(),
+  "recordsAffected": payload.affectedRows
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </sub-flow>
 
 </mule>

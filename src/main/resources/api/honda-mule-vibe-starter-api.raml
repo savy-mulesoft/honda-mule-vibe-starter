@@ -1,11 +1,11 @@
 #%RAML 1.0
 title: Honda Mule Vibe Starter API
-version: v1
+version: v2
 baseUri: http://localhost:8081/api
 
 description: |
   A Honda Mule Vibe Starter API showcasing modern MuleSoft development.
-  Provides basic greeting functionality.
+  Provides basic greeting and welcome functionality, plus product category management.
 
 mediaType: application/json
 
@@ -36,6 +36,121 @@ types:
             type: string
             description: Application version
             example: "1.0.0-SNAPSHOT"
+  
+  WelcomeResponse:
+    type: object
+    properties:
+      welcomeMessage:
+        type: string
+        description: The welcome message
+        example: "Welcome to Honda Mule Vibe Starter API! Ready to accelerate your development journey."
+      status:
+        type: string
+        description: Current application status
+        example: "active"
+      timestamp:
+        type: datetime
+        description: Response timestamp
+        example: "2026-01-18T22:24:38.123-05:00"
+      features:
+        type: array
+        items:
+          type: string
+        description: Available API features
+        example: ["hello endpoint", "welcome endpoint", "APIKit integration"]
+
+  ProductCategoryRequest:
+    type: object
+    properties:
+      productLine:
+        type: string
+        description: Product line identifier
+        example: "A"
+        required: true
+      productCategoryCode:
+        type: string
+        description: Product category code
+        example: "200"
+        required: true
+      productCategoryGroupCode:
+        type: string
+        description: Product category group code
+        example: "SG1"
+        required: true
+      productCategoryName:
+        type: string
+        description: Product category name
+        example: "Sedan"
+        required: false
+      doorType:
+        type: string
+        description: Door type specification
+        example: "4D"
+        required: false
+      cylinderCount:
+        type: string
+        description: Cylinder count
+        example: "4"
+        required: false
+      motivePower:
+        type: string
+        description: Motive power type
+        example: "Gas"
+        required: false
+      productCategoryGroupName:
+        type: string
+        description: Product category group name
+        example: "Passenger Vehicles"
+        required: false
+      businessKeyDeleteIndicator:
+        type: string
+        description: Delete indicator (Y/N)
+        example: "N"
+        required: false
+
+  ProductCategoryResponse:
+    type: object
+    properties:
+      actionCode:
+        type: string
+        description: Action performed (A=Insert, C=Update, D=Delete)
+        example: "A"
+      productLine:
+        type: string
+        description: Product line identifier
+        example: "A"
+      productCategoryCode:
+        type: string
+        description: Product category code
+        example: "200"
+      productCategoryGroupCode:
+        type: string
+        description: Product category group code
+        example: "SG1"
+      productCategoryName:
+        type: string
+        description: Product category name
+        example: "Sedan"
+      doorType:
+        type: string
+        description: Door type specification
+        example: "4D"
+      cylinderCount:
+        type: string
+        description: Cylinder count
+        example: "4"
+      motivePower:
+        type: string
+        description: Motive power type
+        example: "Gas"
+      groupName:
+        type: string
+        description: Derived group name
+        example: "Passenger Vehicles"
+      timestamp:
+        type: datetime
+        description: Operation timestamp
+        example: "2026-01-19T16:09:38.123-05:00"
 
 /hello:
   displayName: Hello World Endpoint
@@ -55,3 +170,189 @@ types:
               application:
                 name: "honda-mule-vibe-starter-api"
                 version: "1.0.0-SNAPSHOT"
+
+/welcome:
+  displayName: Welcome Endpoint
+  description: Returns a welcome message with API features information
+  get:
+    description: Get a welcome message with available features
+    responses:
+      200:
+        description: Successful welcome response
+        body:
+          application/json:
+            type: WelcomeResponse
+            example:
+              welcomeMessage: "Welcome to Honda Mule Vibe Starter API! Ready to accelerate your development journey."
+              status: "active"
+              timestamp: "2026-01-18T22:24:38.123-05:00"
+              features: ["hello endpoint", "welcome endpoint", "APIKit integration"]
+
+/v1/product-categories:
+  displayName: Product Categories Management
+  description: Manages product category data with create, update, delete, and retrieve operations
+  put:
+    description: |
+      Creates, updates, or deletes product category records based on business logic.
+      Determines operation based on existing data comparison and delete indicator.
+    headers:
+      consumerId:
+        type: string
+        description: Consumer identifier
+        required: true
+        example: "honda-process-api"
+      consumerName:
+        type: string
+        description: Consumer name
+        required: true
+        example: "Honda Process API"
+      correlationId:
+        type: string
+        description: Correlation identifier for tracing
+        required: true
+        example: "12345678-1234-1234-1234-123456789012"
+      callerName:
+        type: string
+        description: Name of the calling system
+        required: true
+        example: "Model MDA Process"
+      language:
+        type: string
+        description: Language preference
+        required: false
+        example: "en"
+    body:
+      application/json:
+        type: ProductCategoryRequest
+        example:
+          productLine: "A"
+          productCategoryCode: "200"
+          productCategoryGroupCode: "SG1"
+          productCategoryName: "Sedan"
+          doorType: "4D"
+          cylinderCount: "4"
+          motivePower: "Gas"
+          productCategoryGroupName: "Passenger Vehicles"
+          businessKeyDeleteIndicator: "N"
+    responses:
+      200:
+        description: Operation completed successfully
+        body:
+          application/json:
+            type: ProductCategoryResponse
+            example:
+              actionCode: "A"
+              productLine: "A"
+              productCategoryCode: "200"
+              productCategoryGroupCode: "SG1"
+              productCategoryName: "Sedan"
+              doorType: "4D"
+              cylinderCount: "4"
+              motivePower: "Gas"
+              groupName: "Passenger Vehicles"
+              timestamp: "2026-01-19T16:09:38.123-05:00"
+      204:
+        description: No operation performed (no changes detected)
+      400:
+        description: Bad request - invalid input data
+        body:
+          application/json:
+            example:
+              error: "Invalid request"
+              message: "Required business keys are missing"
+              timestamp: "2026-01-19T16:09:38.123-05:00"
+      500:
+        description: Internal server error
+        body:
+          application/json:
+            example:
+              error: "Internal server error"
+              message: "An unexpected error occurred"
+              timestamp: "2026-01-19T16:09:38.123-05:00"
+  get:
+    description: |
+      Retrieves product category data for the provided business keys.
+      Used to verify records created or updated via PUT operation.
+    headers:
+      consumerId:
+        type: string
+        description: Consumer identifier
+        required: true
+        example: "honda-process-api"
+      consumerName:
+        type: string
+        description: Consumer name
+        required: true
+        example: "Honda Process API"
+      correlationId:
+        type: string
+        description: Correlation identifier for tracing
+        required: true
+        example: "12345678-1234-1234-1234-123456789012"
+      callerName:
+        type: string
+        description: Name of the calling system
+        required: true
+        example: "Model MDA Process"
+      language:
+        type: string
+        description: Language preference
+        required: false
+        example: "en"
+    queryParameters:
+      productLine:
+        type: string
+        description: Product line identifier
+        required: true
+        example: "A"
+      productCategoryCode:
+        type: string
+        description: Product category code
+        required: true
+        example: "200"
+      productCategoryGroupCode:
+        type: string
+        description: Product category group code
+        required: true
+        example: "SG1"
+    responses:
+      200:
+        description: Product category found
+        body:
+          application/json:
+            type: ProductCategoryResponse
+            example:
+              actionCode: "C"
+              productLine: "A"
+              productCategoryCode: "200"
+              productCategoryGroupCode: "SG1"
+              productCategoryName: "Sedan"
+              doorType: "4D"
+              cylinderCount: "4"
+              motivePower: "Gas"
+              groupName: "Passenger Vehicles"
+              timestamp: "2026-01-19T16:09:38.123-05:00"
+      404:
+        description: Product category not found
+        body:
+          application/json:
+            example:
+              error: "Not found"
+              message: "Product category not found for the provided business keys"
+              timestamp: "2026-01-19T16:09:38.123-05:00"
+      400:
+        description: Bad request - missing required query parameters
+        body:
+          application/json:
+            example:
+              error: "Bad request"
+              message: "Required query parameters are missing"
+              timestamp: "2026-01-19T16:09:38.123-05:00"
+      500:
+        description: Internal server error
+        body:
+          application/json:
+            example:
+              error: "Internal server error"
+              message: "An unexpected error occurred"
+              timestamp: "2026-01-19T16:09:38.123-05:00"

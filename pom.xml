@@ -32,6 +32,14 @@
                 <artifactId>mule-maven-plugin</artifactId>
                 <version>${mule.maven.plugin.version}</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <sharedLibraries>
+                        <sharedLibrary>
+                            <groupId>com.microsoft.sqlserver</groupId>
+                            <artifactId>mssql-jdbc</artifactId>
+                        </sharedLibrary>
+                    </sharedLibraries>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -56,6 +64,21 @@
             <artifactId>mule-apikit-module</artifactId>
             <version>1.10.4</version>
             <classifier>mule-plugin</classifier>
+        </dependency>
+        
+        <!-- Database Connector -->
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-db-connector</artifactId>
+            <version>1.15.0</version>
+            <classifier>mule-plugin</classifier>
+        </dependency>
+        
+        <!-- SQL Server Driver -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>11.2.3.jre17</version>
         </dependency>
         
     </dependencies>
