@@ -1,5 +1,7 @@
 {
   "name": "honda-mule-vibe-starter",
   "minMuleVersion": "4.10.0",
-  "javaSpecificationVersions": ["17"]
+  "javaSpecificationVersions": [
+    "17"
+  ]
 }

@@ -18,21 +18,15 @@
 
     <!-- Database Configuration -->
     <db:config name="Database_Config" doc:name="Database Config">
-        <db:mssql-connection host="${db.host}" 
-                             port="${db.port}" 
-                             user="${db.username}" 
-                             password="${db.password}" 
-                             databaseName="${db.name}">
+        <db:generic-connection url="jdbc:db2://${db.host}:${db.port}/${db.name}:currentSchema=${db.schema};" 
+                              driverClassName="com.ibm.db2.jcc.DB2Driver"
+                              user="${db.username}" 
+                              password="${db.password}">
             <db:pooling-profile maxPoolSize="${db.connection.pool.maxPoolSize}" 
                                minPoolSize="${db.connection.pool.minPoolSize}" 
                                acquireIncrement="${db.connection.pool.acquireIncrement}" 
                                preparedStatementCacheSize="${db.connection.pool.preparedStatementCacheSize}" />
-            <db:connection-properties>
-                <db:connection-property key="encrypt" value="true" />
-                <db:connection-property key="trustServerCertificate" value="true" />
-                <db:connection-property key="loginTimeout" value="30" />
-            </db:connection-properties>
-        </db:mssql-connection>
+        </db:generic-connection>
     </db:config>
 
     <!-- HTTP Listener Configuration -->
@@ -350,8 +344,8 @@ else
                 :productCategoryGroupName,
                 :businessKeyDeleteIndicator,
                 :lastActionCode,
-                SYSUTCDATETIME(),
-                SYSUTCDATETIME()
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
             )]]></db:sql>
             <db:input-parameters><![CDATA[#[{
                 productLine: vars.inputPayload.productLine,
@@ -402,7 +396,7 @@ output application/json
                 product_category_group_name = :productCategoryGroupName,
                 business_key_delete_indicator = :businessKeyDeleteIndicator,
                 last_action_code = :lastActionCode,
-                updated_utc = SYSUTCDATETIME()
+                updated_utc = CURRENT_TIMESTAMP
             WHERE product_line = :productLine 
                 AND product_category_code = :productCategoryCode 
                 AND product_category_group_code = :productCategoryGroupCode]]></db:sql>

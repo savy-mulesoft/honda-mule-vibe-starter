@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    
     <modelVersion>4.0.0</modelVersion>
     <groupId>e5c02810-ef86-427e-8e6b-f3d3abe55974</groupId>
     <artifactId>honda-mule-vibe-starter</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>mule-application</packaging>
-    
     <name>Honda Mule Vibe Starter</name>
     <description>A Honda Mule Vibe Starter project showcasing modern MuleSoft development</description>
-    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -19,7 +16,6 @@
         <exchange.organization.id>e5c02810-ef86-427e-8e6b-f3d3abe55974</exchange.organization.id>
         <mule.maven.plugin.version>4.6.1</mule.maven.plugin.version>
     </properties>
-    
     <build>
         <plugins>
             <plugin>
@@ -35,15 +31,14 @@
                 <configuration>
                     <sharedLibraries>
                         <sharedLibrary>
-                            <groupId>com.microsoft.sqlserver</groupId>
-                            <artifactId>mssql-jdbc</artifactId>
+                            <groupId>com.ibm.db2</groupId>
+                            <artifactId>jcc</artifactId>
                         </sharedLibrary>
                     </sharedLibraries>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    
     <dependencies>
         <!-- Mule Connectors -->
         <dependency>
@@ -65,7 +60,6 @@
             <version>1.10.4</version>
             <classifier>mule-plugin</classifier>
         </dependency>
-        
         <!-- Database Connector -->
         <dependency>
             <groupId>org.mule.connectors</groupId>
@@ -73,16 +67,13 @@
             <version>1.15.0</version>
             <classifier>mule-plugin</classifier>
         </dependency>
-        
-        <!-- SQL Server Driver -->
+        <!-- DB2 JDBC Driver -->
         <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <version>11.2.3.jre17</version>
+            <groupId>com.ibm.db2</groupId>
+            <artifactId>jcc</artifactId>
+            <version>11.5.9.0</version>
         </dependency>
-        
     </dependencies>
-    
     <repositories>
         <repository>
             <id>anypoint-exchange-v3</id>
@@ -97,7 +88,6 @@
             <layout>default</layout>
         </repository>
     </repositories>
-    
     <pluginRepositories>
         <pluginRepository>
             <id>mulesoft-releases</id>
@@ -109,5 +99,4 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-    
 </project>
