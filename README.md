@@ -1,13 +1,13 @@
 # Honda Mule Vibe Starter - Advanced Database Edition
 
-A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **MS SQL Server database connectivity**. This advanced version builds upon the basic starter project by adding full CRUD operations with database persistence for Product Categories management.
+A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **DB2 database connectivity**. This advanced version builds upon the basic starter project by adding full CRUD operations with database persistence for Product Categories management.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Java 17
 - Maven 3.8+
-- **Your own MS SQL Server instance** (local, cloud, or provided by your organization)
+- **Your own DB2 database instance** (local, cloud, or provided by your organization)
 
 ### ⚠️ **VERY IMPORTANT** - Before You Start
 **Replace the Organization ID in pom.xml with your own Anypoint Platform Organization ID!**
@@ -24,13 +24,13 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 
 ### 🗄️ **Database Setup for Hackathon Participants**
 
-**STEP 1: Configure Your SQL Server Connection**
+**STEP 1: Configure Your DB2 Connection**
 1. Open `src/main/resources/application.properties`
-2. Update **ALL** database connection details with your own SQL Server instance:
+2. Update **ALL** database connection details with your own DB2 instance:
    ```properties
-   # Replace with YOUR SQL Server details
-   db.host=YOUR_SQL_SERVER_HOST
-   db.port=YOUR_SQL_SERVER_PORT
+   # Replace with YOUR DB2 details
+   db.host=YOUR_DB2_HOST
+   db.port=YOUR_DB2_PORT
    db.name=YOUR_DATABASE_NAME
    db.username=YOUR_USERNAME
    db.password=YOUR_PASSWORD
@@ -45,7 +45,7 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 4. Update the schema name to match your database schema
 
 **STEP 3: Execute Database Setup**
-1. Connect to **YOUR** MS SQL Server instance
+1. Connect to **YOUR** DB2 instance
 2. Use **YOUR** database credentials
 3. Execute the updated `initial_setup.sql` script
 4. Verify your table is created: `[YOUR_SCHEMA].prdt_ctgry_[YOUR_EMPLOYEE_ID]`
@@ -54,6 +54,7 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 
 1. **Build and run:**
    ```bash
+   # Run this command in terminal (zsh/bash) - NOT in VSCode integrated terminal
    mvn clean package
    Visual Studio > Run and Debug
    ```
@@ -85,7 +86,7 @@ Expected response:
 - **GET /api/welcome** - Welcome message with feature list
 
 ### **Advanced Database Features:**
-- **MS SQL Server Integration** - Full database connectivity
+- **DB2 Integration** - Full database connectivity
 - **Product Categories API** - Complete CRUD operations
 - **PUT /api/v1/product-categories** - Insert/Update/Delete operations
 - **GET /api/v1/product-categories** - Query operations
@@ -94,7 +95,7 @@ Expected response:
 - **Business Key Validation** - Required fields: productLine, productCategoryCode, productCategoryGroupCode
 
 ### **Technical Enhancements:**
-- **JDBC Driver Configuration** - Proper shared library setup for SQL Server driver
+- **JDBC Driver Configuration** - Proper shared library setup for DB2 driver
 - **SSL Certificate Handling** - Bypasses certificate validation for cloud databases
 - **Connection Pooling** - Optimized database connection management
 - **Error Handling** - Comprehensive validation and error responses
@@ -105,7 +106,7 @@ Expected response:
 ### **What We're Testing:**
 
 1. **Local Database Connectivity**
-   - Verify Anypoint Code Builder can connect to MS SQL Server from your local machine
+   - Verify Anypoint Code Builder can connect to DB2 from your local machine
    - Same database configuration used in hackathon environment
    - Schema: `mule_hkthn_0226` / Table: `prdt_ctgry_[EMPLOYEE_ID]`
 
@@ -188,7 +189,7 @@ curl --location 'http://localhost:8081/api/v1/product-categories?productLine=B&p
 ## 🎯 Hackathon Validation Checklist
 
 ### ✅ **Connectivity Test**
-- [ ] Local Anypoint Code Builder connects to YOUR MS SQL Server instance
+- [ ] Local Anypoint Code Builder connects to YOUR DB2 instance
 - [ ] YOUR database credentials work correctly
 - [ ] Can access YOUR database schema
 - [ ] Custom table created: `prdt_ctgry_[YOUR_EMPLOYEE_ID]` in YOUR schema
@@ -203,17 +204,17 @@ curl --location 'http://localhost:8081/api/v1/product-categories?productLine=B&p
 ### ✅ **Build and Dependency Test**
 - [ ] `mvn clean package` completes successfully
 - [ ] All Maven dependencies download without issues
-- [ ] SQL Server JDBC driver loads properly (no classloader errors)
+- [ ] DB2 JDBC driver loads properly (no classloader errors)
 - [ ] Application starts without connectivity errors
 
 ## 🏗️ Technical Architecture
 
 ### **Database Configuration:**
-- **Host:** `[YOUR_SQL_SERVER_HOST]:[YOUR_SQL_SERVER_PORT]`
+- **Host:** `[YOUR_DB2_HOST]:[YOUR_DB2_PORT]`
 - **Database:** `[YOUR_DATABASE_NAME]`
 - **Schema:** `[YOUR_SCHEMA_NAME]`
 - **Table Pattern:** `prdt_ctgry_[YOUR_EMPLOYEE_ID]`
-- **Driver:** SQL Server JDBC 11.2.3.jre17 (configured as shared library)
+- **Driver:** DB2 JDBC 11.5.9.0 (configured as shared library)
 - **SSL:** Certificate validation bypassed for cloud database connections
 
 ### **API Endpoints:**
@@ -240,11 +241,10 @@ This advanced version demonstrates:
 
 ### **Key Differences from Basic Version:**
 - ✅ Full database CRUD operations
-- ✅ MS SQL Server connectivity with SSL bypass
+- ✅ DB2 connectivity with SSL bypass
 - ✅ Business logic implementation (Add/Change/Delete determination)
 - ✅ Header and business key validation
 - ✅ Proper error handling and HTTP status codes
 - ✅ JDBC driver shared library configuration
 
 Happy coding! 🎯
-
