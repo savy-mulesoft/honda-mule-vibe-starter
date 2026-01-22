@@ -9,6 +9,8 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 - Maven 3.8+
 - **Your own DB2 database instance** (local, cloud, or provided by your organization)
 
+⚠️ **DB2 Version Compatibility Notice**: This project has been tested with **DB2 v12.1.3.0**. If you're using a different DB2 version, you may encounter compatibility issues or need to adjust JDBC driver versions accordingly.
+
 ### ⚠️ **VERY IMPORTANT** - Before You Start
 **Replace the Organization ID in pom.xml with your own Anypoint Platform Organization ID!**
 
@@ -109,6 +111,7 @@ Expected response:
    - Verify Anypoint Code Builder can connect to DB2 from your local machine
    - Same database configuration used in hackathon environment
    - Schema: `mule_hkthn_0226` / Table: `prdt_ctgry_[EMPLOYEE_ID]`
+   - **Note**: Tested with DB2 v12.1.3.0 - different DB2 versions may require JDBC driver updates
 
 2. **RESTful Database Operations**
    - Write data to database via PUT endpoint
@@ -193,6 +196,7 @@ curl --location 'http://localhost:8081/api/v1/product-categories?productLine=B&p
 - [ ] YOUR database credentials work correctly
 - [ ] Can access YOUR database schema
 - [ ] Custom table created: `prdt_ctgry_[YOUR_EMPLOYEE_ID]` in YOUR schema
+- [ ] **Version Check**: Verify DB2 version compatibility (tested with v12.1.3.0)
 
 ### ✅ **API Functionality Test**
 - [ ] PUT endpoint successfully inserts new records
@@ -216,6 +220,7 @@ curl --location 'http://localhost:8081/api/v1/product-categories?productLine=B&p
 - **Table Pattern:** `prdt_ctgry_[YOUR_EMPLOYEE_ID]`
 - **Driver:** DB2 JDBC 11.5.9.0 (configured as shared library)
 - **SSL:** Certificate validation bypassed for cloud database connections
+- **Tested DB2 Version:** DB2 v12.1.3.0 (other versions may require driver adjustments)
 
 ### **API Endpoints:**
 - `GET /api/hello` - Basic health check
