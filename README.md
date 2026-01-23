@@ -52,11 +52,23 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 
 ### Run the Application
 
+### Run the Application
+
 1. **Build and run:**
    ```bash
-   mvn clean package in Terminal
-   Visual Studio > Run and Debug
+   # Run this command in VSCode terminal (zsh)
+   mvn clean package
    ```
+   <img width="1291" height="311" alt="Screenshot 2026-01-23 at 11 22 40 AM" src="https://github.com/user-attachments/assets/0c8c0e64-b85e-40ae-8079-6944cee298fb" />
+
+
+   **Then:**
+   ```bash
+   Visual Studio > Run and Debug > Run Mule Application
+   ```
+   <img width="412" height="196" alt="Screenshot 2026-01-23 at 11 23 23 AM" src="https://github.com/user-attachments/assets/853f21bc-1333-4ced-88ea-b125a4932a09" />
+
+
 
 2. **Test the basic API:**
    ```bash
