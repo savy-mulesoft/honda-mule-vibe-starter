@@ -56,7 +56,7 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
 
 1. **Build and run:**
    ```bash
-   # Run this command in terminal (zsh/bash) - NOT in VSCode integrated terminal
+   # Run this command in VSCode terminal (zsh)
    mvn clean package
    Visual Studio > Run and Debug
    ```
