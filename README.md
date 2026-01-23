@@ -27,7 +27,9 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development.
    ```bash
    # Run this command in VSCode terminal (zsh)
    mvn clean package
-   Visual Studio > Run and Debug
+
+   # Then 
+   Visual Studio > Run and Debug > Run Mule Application
    ```
 
 2. **Test the API:**
