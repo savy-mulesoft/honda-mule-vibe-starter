@@ -37,20 +37,16 @@ A Honda Mule Vibe Starter project showcasing modern MuleSoft development with **
    db.username=YOUR_USERNAME
    db.password=YOUR_PASSWORD
    db.schema=YOUR_SCHEMA_NAME
-   db.table=prdt_ctgry_[YOUR_EMPLOYEE_ID]
+   db.table=PRDT_CTGRY
    ```
 
-**STEP 2: Update SQL Script with Your Employee ID**
-1. Open `src/main/resources/sql/initial_setup.sql`
-2. Find the table name: `prdt_ctgry_12345`
-3. Replace `12345` with **your employee ID**
-4. Update the schema name to match your database schema
-
-**STEP 3: Execute Database Setup**
+**STEP 2: Execute Database Setup**
 1. Connect to **YOUR** DB2 instance
 2. Use **YOUR** database credentials
 3. Execute the updated `initial_setup.sql` script
-4. Verify your table is created: `[YOUR_SCHEMA].prdt_ctgry_[YOUR_EMPLOYEE_ID]`
+4. Verify your table is created: `[YOUR_SCHEMA].PRDT_CTGRY`
+
+
 
 ### Run the Application
 
